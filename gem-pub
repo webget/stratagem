@@ -22,15 +22,19 @@
 
 pwd=`pwd`
 basename=`basename $pwd`
-rdoc_template=railapp
+gem_name_prefix='webget_ruby_'
+gem_name=$gem_name_prefix$basename
+#rdoc_template=railapp
 local_path_for_gem_generate=/www/htdocs
 remote_user=joel
 remote_host=www.webget.com
 remote_port=7022
 remote_path_for_gem_generate=/www/html
 
+
 # Remove all versions of this gem
-git rm -f $basename-*.gem
+rm -f *.gem
+rm -f *.sha512.txt
 
 # Remove all old temp files
 find . | grep ".*~" | xargs rm -f "*~"
@@ -43,10 +47,11 @@ rm -fr doc/
 gem build --quiet $basename.gemspec
 
 # Create checksum
-sha512sum $basename-*.gem > $basename.sha512.txt
+sha512sum $gem_name-*.gem > $gem_name.sha512.txt
 
 # Create rdoc with our custom template
-rdoc --all  --quiet --template=$rdoc_template --inline --line-numbers --main lib/$basename.rb
+#rdoc --all  --quiet --template=$rdoc_template --inline --line-numbers --main lib/$basename.rb
+rdoc --all  --quiet --line-numbers --main lib/$basename.rb
 
 # Create README
 ruby-header-comments-to-rdoc lib/$basename.rb README.rdoc
@@ -59,35 +64,38 @@ git commit -m "$1" -a
 #### LOCAL DEPLOY
 
 # Make the local directory, if needed
-mkdir -p $local_path_for_gem_generate/gems/$basename
+mkdir -p $local_path_for_gem_generate/gems/$gemname
 
 # Copy all the files to the local equivalent directory
-cp -r . $local_path_for_gem_generate/gems/$basename/
+cp -r . $local_path_for_gem_generate/gems/$gemname/
 
 # Copy the gem to the local gem directory
 cp *.gem $local_path_for_gem_generate/gems/
 
 # Generate the local gem files
-gem generate --backtrace --directory=$local_path_for_gem_generate/
+sudo gem generate --backtrace --directory=$local_path_for_gem_generate/
 
 echo 'LOCAL COMPLETE'
 
 
 #### REMOTE DEPLOY
 
-# Upload to github etc.
-git push
-
 # Make the remote directory, if needed
-ssh -p $remote_port $remote_user@$remote_host "mkdir -p $remote_path_for_gem_generate/gems/$basename"
+ssh -p $remote_port $remote_user@$remote_host "mkdir -p $remote_path_for_gem_generate/gems/$gem_name"
 
 # Copy all the files to the equivalent directory
-rsync -e "ssh -p $remote_port" --recursive --hard-links --executability --times * $remote_user@$remote_host:$remote_path_for_gem_generate/gems/$basename/
+rsync -e "ssh -p $remote_port" --recursive --hard-links --executability --times * $remote_user@$remote_host:$remote_path_for_gem_generate/gems/$gem_name/
 
 # Copy the gem to the gem directory
+echo "rsync..."
 rsync -e "ssh -p $remote_port" *.gem -t $remote_user@$remote_host:$remote_path_for_gem_generate/gems/
 
 # Generate the gem files
+echo "generate..."
 ssh -p $remote_port $remote_user@$remote_host "gem generate --backtrace --directory=$remote_path_for_gem_generate/"
+
+# Upload to github etc.
+echo "github..."
+git push
 
 echo 'REMOTE COMPLETE'

@@ -8,7 +8,7 @@ do
   echo $gemdir
   cd $gemdir
   echo `pwd`
-  `gem-pub`
+  gem-pub "$1"
 done
 
 

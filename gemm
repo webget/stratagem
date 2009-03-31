@@ -1,0 +1,3 @@
+#!/bin/sh
+gem uninstall $1 --all --ignore-dependencies 
+gem install $1 --source='http://webget.com' --test --no-ri --no-rdoc --no-user-install --trust-policy HighSecurity
