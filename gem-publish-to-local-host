@@ -1,0 +1,10 @@
+#!/bin/sh
+
+gem_name=`gem-name`
+gem_generate_directory=/www/doc
+
+mkdir -p $gem_generate_directory/gems/$gem_name
+rsync --recursive -C --hard-links --exclude='.git/' --executability --delete --times * $gem_generate_directory/gems/$gem_name/
+rsync *.gem $gem_generate_directory/gems/
+gem generate --backtrace --directory=$gem_generate_directory/
+
