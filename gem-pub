@@ -20,17 +20,23 @@
 #   => copy to railapp.com then remote gem generate
 ##
 
+# Paths
+gem=/usr/bin/gem
+ruby=/usr/bin/ruby
+
+# Where are we running?
 pwd=`pwd`
 basename=`basename $pwd`
-gem_name_prefix='webget_ruby_'
-gem_name=$gem_name_prefix$basename
-#rdoc_template=railapp
-local_path_for_gem_generate=/www/htdocs
-remote_user=joel
-remote_host=www.webget.com
-remote_port=7022
-remote_path_for_gem_generate=/www/html
+gem_name=`gem-name`
+echo gem name: $gem_name
 
+# rdoc template path 
+# see /usr/local/lib/ruby/gems/1.9.1/gems/rdoc-2.4.2/lib/rdoc/generator/webget.rb
+# seee /usr/local/lib/ruby/1.9.1/rdoc/generator/html/webget.rb
+rdoc_template=webget
+
+
+#### LOCAL BUILD
 
 # Remove all versions of this gem
 rm -f *.gem
@@ -47,55 +53,17 @@ rm -fr doc/
 gem build --quiet $basename.gemspec
 
 # Create checksum
-sha512sum $gem_name-*.gem > $gem_name.sha512.txt
+sha512sum $gem_name*.gem > $gem_name.sha512.txt
 
 # Create rdoc with our custom template
-#rdoc --all  --quiet --template=$rdoc_template --inline --line-numbers --main lib/$basename.rb
-rdoc --all  --quiet --line-numbers --main lib/$basename.rb
+#rdoc --all  --quiet --template=$rdoc_template --line-numbers --title $gem_name --main lib/$basename.rb
+rdoc  --all --quiet --line-numbers --inline-source --title $gem_name --main lib/
+chmod +r -R doc/
 
 # Create README
 ruby-header-comments-to-rdoc lib/$basename.rb README.rdoc
 
-# LOCAL GIT
-git add *
-git commit -m "$1" -a
+echo 'PUBLISH LOCAL...'  && gem-publish-to-local-host  && echo '...LOCAL DONE'
+echo 'PUBLISH REMOTE...' && gem-publish-to-remote-host && echo '...REMOTE DONE'
+echo 'PUBLISH GITHUB...' && gem-publish-to-github      && echo '...GITHUB DONE'
 
-
-#### LOCAL DEPLOY
-
-# Make the local directory, if needed
-mkdir -p $local_path_for_gem_generate/gems/$gemname
-
-# Copy all the files to the local equivalent directory
-cp -r . $local_path_for_gem_generate/gems/$gemname/
-
-# Copy the gem to the local gem directory
-cp *.gem $local_path_for_gem_generate/gems/
-
-# Generate the local gem files
-sudo gem generate --backtrace --directory=$local_path_for_gem_generate/
-
-echo 'LOCAL COMPLETE'
-
-
-#### REMOTE DEPLOY
-
-# Make the remote directory, if needed
-ssh -p $remote_port $remote_user@$remote_host "mkdir -p $remote_path_for_gem_generate/gems/$gem_name"
-
-# Copy all the files to the equivalent directory
-rsync -e "ssh -p $remote_port" --recursive --hard-links --executability --times * $remote_user@$remote_host:$remote_path_for_gem_generate/gems/$gem_name/
-
-# Copy the gem to the gem directory
-echo "rsync..."
-rsync -e "ssh -p $remote_port" *.gem -t $remote_user@$remote_host:$remote_path_for_gem_generate/gems/
-
-# Generate the gem files
-echo "generate..."
-ssh -p $remote_port $remote_user@$remote_host "gem generate --backtrace --directory=$remote_path_for_gem_generate/"
-
-# Upload to github etc.
-echo "github..."
-git push
-
-echo 'REMOTE COMPLETE'
