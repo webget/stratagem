@@ -5,7 +5,7 @@ user=joel
 host=www.webget.com
 port=7022
 gem_generate_directory=/www/html
-ssh=ssh -p $port $user@$host
+ssh="ssh -p $port $user@$host"
 
 # Make the remote directory, if needed
 $ssh "mkdir -p $gem_generate_directory/gems/$gem_name"

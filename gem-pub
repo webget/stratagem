@@ -35,6 +35,7 @@ echo gem name: $gem_name
 # seee /usr/local/lib/ruby/1.9.1/rdoc/generator/html/webget.rb
 rdoc_template=webget
 
+msg=$1
 
 #### LOCAL BUILD
 
@@ -65,5 +66,5 @@ ruby-header-comments-to-rdoc lib/$basename.rb README.rdoc
 
 echo 'PUBLISH LOCAL...'  && gem-publish-to-local-host  && echo '...LOCAL DONE'
 echo 'PUBLISH REMOTE...' && gem-publish-to-remote-host && echo '...REMOTE DONE'
-echo 'PUBLISH GITHUB...' && gem-publish-to-github      && echo '...GITHUB DONE'
+echo 'PUBLISH GITHUB...' && gem-publish-to-github $msg && echo '...GITHUB DONE'
 
