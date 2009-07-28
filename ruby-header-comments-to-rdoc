@@ -1,14 +1,23 @@
-#!/usr/bin/ruby -w
+#!/usr/local/bin/ruby -w
+
 input_ruby_filename,output_rdoc_filename=ARGV
+
+puts "Input ruby file: "+input_ruby_filename
+puts "Output rdoc file: "+output_rdoc_filename
+
 File.exist?(input_ruby_filename) or raise "File #{input_ruby_filename} does not exist"
 input=File.new(input_ruby_filename)
-output=''
+output=[]
+began=false
 
 while line=input.gets
-  if line=~/^##/ or line=~/^\s+/ or line=~/^$/ then break end
-  if line=~/^#!/ or line=~/^# -\*- coding: / then next end
-  line=~/^# {0,1}/
-  output+=$'
+puts line
+  next if line=~/^#!/ or line=~/^# -\*- coding: /
+  if line=~/^=begin / then began=true; next; end
+  break if line=~/^##/ or line=~/^=end /
+  break if !began and (line=~/^$/ and line=~/^\s+/)
+  if !began then line.sub!(/^# /,'') end
+  output << line
 end
 
-File.open(output_rdoc_filename, 'w') {|f| f.write(output) }
+File.open(output_rdoc_filename, 'w') {|f| f.write(output.join) }

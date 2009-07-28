@@ -1,3 +1,5 @@
 #!/bin/sh
-#gem uninstall $1 --all --ignore-dependencies 
-gem install $1 --source='http://webget.com' --test --no-ri --no-rdoc --no-user-install --trust-policy HighSecurity
+gem uninstall $1 --all --ignore-dependencies 
+rm -f /usr/local/lib/ruby/gems/1.8/cache/$1-*.gem 
+gem install $1 --source='http://webget.com' --test --no-user-install --trust-policy HighSecurity
+
