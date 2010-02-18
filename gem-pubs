@@ -2,7 +2,7 @@
 
 top=/home/webget/github
 
-for dir in /home/webget/github/*/*gemspec
+for dir in /home/webget/github/ruby/*/*gemspec
 do
   gemdir=`dirname $dir`
   echo $gemdir

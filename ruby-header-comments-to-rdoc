@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby -w
+#!/usr/bin/env ruby
 
 input_ruby_filename,output_rdoc_filename=ARGV
 
@@ -10,14 +10,14 @@ input=File.new(input_ruby_filename)
 output=[]
 began=false
 
-while line=input.gets
-puts line
+input.each_line{|line|
+  break if line=~/^##/ or line=~/^=end/
+  puts line
   next if line=~/^#!/ or line=~/^# -\*- coding: /
   if line=~/^=begin / then began=true; next; end
-  break if line=~/^##/ or line=~/^=end /
   break if !began and (line=~/^$/ and line=~/^\s+/)
   if !began then line.sub!(/^# /,'') end
   output << line
-end
+}
 
 File.open(output_rdoc_filename, 'w') {|f| f.write(output.join) }
