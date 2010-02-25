@@ -12,7 +12,7 @@ began=false
 
 input.each_line{|line|
   break if line=~/^##/ or line=~/^=end/
-  puts line
+  #puts line
   next if line=~/^#!/ or line=~/^# -\*- coding: /
   if line=~/^=begin / then began=true; next; end
   break if !began and (line=~/^$/ and line=~/^\s+/)
