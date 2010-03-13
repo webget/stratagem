@@ -71,6 +71,6 @@ git add README.rdoc
 git commit -m "$msg" -a
 
 #echo 'PUBLISH LOCAL...'  && gem-publish-to-local-host  && echo '...LOCAL DONE'
-#echo 'PUBLISH REMOTE...' && gem-publish-to-remote-host && echo '...REMOTE DONE'
+echo 'PUBLISH REMOTE...' && gem-publish-to-remote-host && echo '...REMOTE DONE'
 echo 'PUBLISH GITHUB...' && gem-publish-to-github $msg && echo '...GITHUB DONE'
 

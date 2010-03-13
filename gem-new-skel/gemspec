@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.require_path      = 'lib'
   s.has_rdoc          = true
   s.files             = ['lib/{name}.rb']
-  s.test_files        = ['test/unit/{name}_test.rb']
+  s.test_files        = ['test/{name}_test.rb']
 
   #s.add_dependency('foo', '>=0.0.0')
 
