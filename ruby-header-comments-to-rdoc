@@ -1,23 +1,17 @@
 #!/usr/bin/env ruby
 
-input_ruby_filename,output_rdoc_filename=ARGV
-
-puts "Input ruby file: "+input_ruby_filename
-puts "Output rdoc file: "+output_rdoc_filename
+input_ruby_filename=ARGV[0]
 
 File.exist?(input_ruby_filename) or raise "File #{input_ruby_filename} does not exist"
 input=File.new(input_ruby_filename)
-output=[]
 began=false
 
 input.each_line{|line|
   break if line=~/^##/ or line=~/^=end/
-  #puts line
   next if (line=~/^#!/ or line=~/^# -\*- (encoding|coding): /)
   if line=~/^=begin / then began=true; next; end
   break if !began and (line=~/^$/ and line=~/^\s+/)
   if !began then line.sub!(/^# /,'') end
-  output << line
+  puts line
 }
 
-File.open(output_rdoc_filename, 'w') {|f| f.write(output.join) }

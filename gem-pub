@@ -57,15 +57,16 @@ gem build --quiet *.gemspec
 # Create checksum
 sha512sum $gem_name*.gem > $gem_name.sha512.txt
 
-# Create rdoc with our custom template
+# Create README
+ruby-header-comments-to-rdoc lib/$gem_name.rb > README.rdoc
+git add README.rdoc
+
+# Create documentation
 #rdoc --all  --quiet --template=$rdoc_template --line-numbers --title $gem_name --main lib/$basename.rb
-rdoc  --all --quiet --line-numbers --inline-source --title $gem_name --main lib/
+#rdoc  --all --quiet --line-numbers --inline-source --title $gem_name --main lib/
+yardoc lib/**/*.rb
 chmod +r -R doc/
 git add doc/*
-
-# Create README
-ruby-header-comments-to-rdoc lib/$gem_name.rb README.rdoc
-git add README.rdoc
 
 # Commit
 git commit -m "$msg" -a
